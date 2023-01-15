@@ -42,17 +42,17 @@
               <td><%= data[i].name %></td>
               <td>
                 <button>
-                  <a href="/detail/users/<%=data[i].id%>" target="_blank"
+                  <a href="/detail-users/<%=data[i].id%>" target="_blank"
                     >Detail</a
                   >
                 </button>
                 <button>
-                  <a href="/detail/users/<%=data[i].id%>/edit" target="_blank"
+                  <a href="/edit-user/<%=data[i].id%>"
                     >Edit</a
                   >
                 </button>
                 <button>
-                  <a href="/detail/users/<%=data[i].id%>/delete" target="_blank"
+                  <a href="/delete-user/<%=data[i].id%>"
                     >Delete</a
                   >
                 </button>
@@ -84,7 +84,7 @@
             <input type="email" class = "form-control" id= "email" name = "email" />
           </div>
           <div class="text-center mt-1">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Create</button>
           </div>
         </form>
       </div>
