@@ -6,7 +6,13 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 3107;
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+//configure view engine
 configViewEngine(app);
+
+//init web route
 initWebRoute(app);
 
 app.listen(port, () => {
