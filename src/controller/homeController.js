@@ -1,4 +1,7 @@
 import db from "../configs/connectDB";
+import multer from "multer";
+import appRootPath from "app-root-path";
+import path from "path";
 
 let getHomePage = async (req, res) => {
   let dataUser = [];
@@ -75,6 +78,94 @@ let updateUser = async (req, res) => {
   return res.redirect("/");
 };
 
+let getUploadFilePage = (req, res) => {
+  res.render("upLoadFilePage");
+};
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, appRootPath.path + "/src/public/image");
+  },
+
+  // By default, multer removes file extensions so let's add them back
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const imageFilter = function (req, file, cb) {
+  // Accept images only
+  if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
+    req.fileValidationError = "Only image files are allowed!";
+    return cb(new Error("Only image files are allowed!"), false);
+  }
+  cb(null, true);
+};
+
+let handleUpLoadSingleFile = async (req, res) => {
+  // 'avatar' is the name of our file input field in the HTML form
+  let upload = multer({
+    storage: storage,
+    fileFilter: imageFilter,
+  }).single("avatar");
+  upload(req, res, function (err) {
+    // req.file contains information of uploaded file
+    // req.body contains information of text fields, if there were any
+
+    if (req.fileValidationError) {
+      return res.send(req.fileValidationError);
+    } else if (!req.file) {
+      return res.send("Please select an image to upload");
+    } else if (err instanceof multer.MulterError) {
+      return res.send(err.code);
+    } else if (err) {
+      return res.send(err);
+    }
+
+    // Display uploaded image for user validation
+    return res.send(
+      `You have uploaded this image: <hr/><img src="/image/${req.file.filename}" width="50%"><hr /><a href="/upload-file">Upload another image</a>`
+    );
+  });
+};
+
+let handleUpLoadMultipleFile = async (req, res) => {
+  // 'avatar_multiple' is the name of our file input field in the HTML form
+  let upload = multer({
+    storage: storage,
+    fileFilter: imageFilter,
+  }).array("avatar_multiple", 2);
+
+  upload(req, res, function (err) {
+    // req.file contains information of uploaded file
+    // req.body contains information of text fields, if there were any
+
+    if (req.fileValidationError) {
+      return res.send(req.fileValidationError);
+    } else if (!req.files) {
+      return res.send("Please select an image to upload");
+    } else if (err instanceof multer.MulterError) {
+      return res.send(err.code);
+    } else if (err) {
+      return res.send(err);
+    }
+
+    // Display uploaded image for user validation
+    let result = "You have uploaded these images: <hr />";
+    const files = req.files;
+
+    // Loop through all the uploaded images and display them on frontend
+    for (let i = 0; i < files.length; i++) {
+      result += `<img src="/image/${files[i].filename}" width="20%" height="25%"  style="margin-right: 20px;">`;
+    }
+    result += '<hr/><a href="/upload-file">Upload more images</a>';
+    return res.send(result);
+  });
+};
+
 module.exports = {
   getHomePage,
   getDetailPage,
@@ -82,4 +173,7 @@ module.exports = {
   deleteUser,
   getEditPage,
   updateUser,
+  getUploadFilePage,
+  handleUpLoadSingleFile,
+  handleUpLoadMultipleFile,
 };
