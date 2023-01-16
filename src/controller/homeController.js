@@ -137,7 +137,7 @@ let handleUpLoadMultipleFile = async (req, res) => {
   let upload = multer({
     storage: storage,
     fileFilter: imageFilter,
-  }).array("avatar_multiple", 2);
+  }).array("avatar_multiple", 5);
 
   upload(req, res, function (err) {
     // req.file contains information of uploaded file
